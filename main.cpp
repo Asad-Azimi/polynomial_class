@@ -10,7 +10,7 @@ public:
     int exp;   // Exponent of the term
     Node* next; // Pointer to the next node
 
-    Node(int c, int e) : coeff(c), exp(e), next(nullptr) {}
+    Node(double c, int e) : coeff(c), exp(e), next(nullptr) {}
 };
 
 // Polynomial class
@@ -46,10 +46,11 @@ public:
     Polynomial() : head(nullptr), tail(nullptr){}
     Polynomial(istream& input)
     {
-        int term;
-        input >> term;
-        for (int i = 0; i < term; ++i) {
-            int coeff, exp;
+        int number_of_term;
+        input >> number_of_term;
+        for (int i = 0; i < number_of_term; ++i) {
+            double coeff;
+            int exp;
             input >> coeff >> exp;
             addTerm(coeff, exp);
         }
@@ -87,7 +88,8 @@ public:
         Node* ptr2 = right_hand_side_poly.head;
 
         while (!(ptr1 == nullptr || ptr2 == nullptr)) {
-            int coeff = 0, exp = 0;
+            double coeff = 0;
+            int exp = 0;
             if (ptr1 -> exp == ptr2 -> exp) {
                 coeff = ptr1 -> coeff + ptr2 -> coeff;
                 exp = ptr1 -> exp;
@@ -143,7 +145,8 @@ public:
         // Node* last = nullptr;
 
         while (!(ptr1 == nullptr || ptr2 == nullptr)) {
-            int coeff = 0, exp = 0;
+            double coeff = 0;
+            int exp = 0;
             if (ptr1 -> exp == ptr2 -> exp) {
                 coeff = ptr1 -> coeff - ptr2 -> coeff;
                 exp = ptr1 -> exp;
@@ -160,7 +163,7 @@ public:
                 exp = ptr2 -> exp;
                 ptr2 = ptr2 -> next;
             }
-
+            cout << "Current coeff: " << coeff << endl << endl;
             if (coeff != 0){
                 Node* newNode = new Node(coeff, exp);
                 if (result.head == nullptr){
@@ -202,7 +205,8 @@ public:
                 current_right_poly = right_hand_poly.head;
             }
             else{
-                int coeff = 0, exp = 0;
+                double coeff = 0;
+                int exp = 0;
                 coeff = current_left_poly -> coeff * current_right_poly -> coeff;
                 exp = current_left_poly -> exp + current_right_poly -> exp;
                 result.addTerm(coeff, exp);
@@ -245,6 +249,8 @@ public:
 
 
     Polynomial operator%(const Polynomial& denominator) const {
+        cout << "Inside the modulo operator\ncurrent value of the denaminator: ";
+        denominator.print();
     
         if (denominator.head == nullptr) {
             throw invalid_argument("Division by zero polynomial.");
@@ -252,31 +258,45 @@ public:
 
         Polynomial dividend = *this;  // Copy of the dividend (the current polynomial)
         Polynomial remainder = *this; // The remainder is initially the dividend
-
-
-        while (remainder.head != nullptr && remainder.head->exp >= denominator.head->exp) {
-            cout << "Current remainder: "<< endl;
-            cout << "Current denominator: " << endl;
+        cout << "Current divident: ";
+        dividend.print();
+        cout << "Current remainder: ";
+        remainder.print();
+        int count = 1;
+        while (remainder.head->exp >= denominator.head->exp) {
+            
+            cout <<count << " Iteration\n\n";
+            
+            cout << "Current denominator: ";
+            denominator.print();
             // Find the leading term of the quotient: (leading term of remainder) / (leading term of divisor)
             double leading_coeff = remainder.head->coeff / denominator.head->coeff;
             int leading_exp = remainder.head->exp - denominator.head->exp;
+            cout << "Leading coeff: " << leading_coeff << "\n\nLeading exp: " << leading_exp<<endl;
 
             // Create the leading term of the quotient
             Polynomial leading_term;
             leading_term.addTerm(leading_coeff, leading_exp);
 
             cout << "Leading term: " << endl;
+            leading_term.print();
 
             // Subtract the product of the leading term and divisor from the remainder
             Polynomial product;
             product = leading_term * denominator;  // Multiply leading term by divisor
+            cout << "Current product: ";
+            product.print();
             remainder = remainder - product;  // Subtract the result from the remainder
 
+            cout << "Current remainder after subtraction: ";
+            remainder.print();
             // You could also add the leading_term to the quotient, but it's not necessary for remainder
-            cout << "New remainder: "  << endl;
+            count++;
         }
 
         // The remainder is returned, and it should have a degree less than the divisor
+        cout <<"\n\nFinals remainde\n";
+        remainder.print();
         return remainder;
     }
 
@@ -285,7 +305,8 @@ public:
     // Parse polynomial from input
     void parseFromInput(int terms, istream& input) {
         for (int i = 0; i < terms; i++) {
-            int coeff, exp;
+            double coeff;
+            int exp;
             input >> coeff >> exp;
             addTerm(coeff, exp);
         }
